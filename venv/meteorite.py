@@ -1,5 +1,7 @@
 import pygame
 import random
+from os import path
+
 
 WIDTH = 600
 HEIGHT = 720
@@ -10,8 +12,8 @@ FPS = 60
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((50, 40))
-        self.image.fill((0, 255, 0))
+        self.image = player_img
+        self.image.set_colorkey((0, 0, 0))
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH / 2
         self.rect.bottom = HEIGHT - 10
@@ -35,8 +37,8 @@ class Player(pygame.sprite.Sprite):
 class Meteorite(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((30, 40))
-        self.image.fill((255, 0, 0))
+        self.image = meteorite_img
+        self.image.set_colorkey((255, 255, 255))
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(WIDTH - self.rect.width)
         self.rect.y = random.randrange(-100, -40)
@@ -52,12 +54,19 @@ class Meteorite(pygame.sprite.Sprite):
             self.speedy = random.randrange(1, 8)
 
 
+img_dir = path.join(path.dirname(__file__), 'images')
 # Создаем окно
 pygame.init()
 pygame.mixer.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Метеоритная атака")
 clock = pygame.time.Clock()
+# Зугружаем картинки
+background = pygame.image.load(path.join(img_dir, "space.png")).convert()
+background_rect = background.get_rect()
+meteorite_img = pygame.image.load(path.join(img_dir, "meteorite.png")).convert()
+player_img = pygame.image.load(path.join(img_dir, "ship.png")).convert()
+#
 all_sprites = pygame.sprite.Group()
 meteorites = pygame.sprite.Group()
 player = Player()
@@ -75,6 +84,7 @@ while running:
             running = False
     all_sprites.update()
     screen.fill((0, 0, 0))
+    screen.blit(background, background_rect)
     all_sprites.draw(screen)
     pygame.display.flip()
 pygame.quit()
