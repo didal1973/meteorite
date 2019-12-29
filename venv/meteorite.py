@@ -43,6 +43,27 @@ class Player(pygame.sprite.Sprite):
         if self.rect.top < 0:
             self.rect.top = 0
 
+    def shoot(self):
+        rocket = Rocket(self.rect.centerx, self.rect.top)
+        all_sprites.add(rocket)
+        rockets.add(rocket)
+
+# Класс выстрела (ракета)
+class Rocket(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = rocket_img
+        self.image.set_colorkey((255, 255, 255))
+        self.rect = self.image.get_rect()
+        self.rect.bottom = y
+        self.rect.centerx = x
+        self.speedy = -10
+
+    def update(self):
+        self.rect.y += self.speedy
+        # Выход за верхнюю часть экрана
+        if self.rect.bottom < 0:
+            self.kill()
 
 # Класс для метеорита
 class Meteorite(pygame.sprite.Sprite):
@@ -75,11 +96,16 @@ clock = pygame.time.Clock()
 # Зугружаем картинки
 background = pygame.image.load(path.join(img_dir, "space.png")).convert()
 background_rect = background.get_rect()
-meteorite_img = pygame.image.load(path.join(img_dir, "meteorite.png")).convert()
+# Космический истребитель
 player_img = pygame.image.load(path.join(img_dir, "ship.png")).convert()
+# Метеорит
+meteorite_img = pygame.image.load(path.join(img_dir, "meteorite.png")).convert()
+# Выстрел (ракета)
+rocket_img = pygame.image.load(path.join(img_dir, "rocket.png")).convert()
 #
 all_sprites = pygame.sprite.Group()
 meteorites = pygame.sprite.Group()
+rockets = pygame.sprite.Group()
 player = Player()
 all_sprites.add(player)
 for i in range(8):
@@ -93,6 +119,9 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                player.shoot()
     all_sprites.update()
     screen.fill((0, 0, 0))
     screen.blit(background, background_rect)
