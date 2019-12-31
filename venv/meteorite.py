@@ -1,11 +1,11 @@
 import pygame
 import random
-from os import path
+import os
 
 # Константы
 WIDTH = 600
 HEIGHT = 720
-FPS = 60
+FPS = 30
 
 
 # Класс для игрока
@@ -121,27 +121,29 @@ def draw_health_bar(canvas, x, y, health):
     pygame.draw.rect(canvas, (255, 255, 255), outline_rect, 2)
 
 
-img_dir = path.join(path.dirname(__file__), 'images')
+img_dir = os.path.join(os.path.dirname(__file__), 'images')
 font_name = pygame.font.match_font('arial')
 # Создаем окно
 pygame.init()
 pygame.mixer.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Метеоритная атака")
+#os.environ['Sp_VIDEO_WINDOW_POS'] = "10, 200"
 clock = pygame.time.Clock()
 # Зугружаем картинки
-background = pygame.image.load(path.join(img_dir, "space.png")).convert()
+background = pygame.image.load(os.path.join(img_dir, "space.png")).convert()
 background_rect = background.get_rect()
 # Космический истребитель
-player_img = pygame.image.load(path.join(img_dir, "ship.png")).convert()
+player_img = pygame.image.load(os.path.join(img_dir, "ship.png")).convert()
 # Метеориты
 meteorite_images = []
 for i in '12345':
-    meteorite_images.append(pygame.image.load(path.join(img_dir, "meteorite0" + i + ".png")).convert())
+    meteorite_images.append(pygame.image.load(os.path.join(img_dir,
+                                                           "meteorite0" + i + ".png")).convert())
 # Выстрел (ракета)
-rocket_img = pygame.image.load(path.join(img_dir, "rocket.png")).convert()
+rocket_img = pygame.image.load(os.path.join(img_dir, "rocket.png")).convert()
 # Жизнь
-live_img = pygame.image.load(path.join(img_dir, "ship_mini.png")).convert()
+live_img = pygame.image.load(os.path.join(img_dir, "ship_mini.png")).convert()
 #
 all_sprites = pygame.sprite.Group()
 meteorites = pygame.sprite.Group()
@@ -192,5 +194,11 @@ while running:
     print_text(screen, str(rating), 18, WIDTH / 2, 10)
     draw_lives(screen, WIDTH - 150, 5, player.lives, live_img)
     draw_health_bar(screen, 5, 5, player.health)
+    if rating <= 1000:
+        pass
+    elif 1000 < rating <= 8000:
+        FPS = (rating + 2000) // 100
+    else:
+        FPS = 100
     pygame.display.flip()
 pygame.quit()
