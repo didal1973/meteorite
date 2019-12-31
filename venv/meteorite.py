@@ -2,7 +2,7 @@ import pygame
 import random
 from os import path
 
-
+# Константы
 WIDTH = 600
 HEIGHT = 720
 FPS = 60
@@ -15,7 +15,8 @@ class Player(pygame.sprite.Sprite):
         self.image = player_img
         self.image.set_colorkey((0, 0, 0))
         self.rect = self.image.get_rect()
-        self.rect.centerx = WIDTH / 2
+        self.radius = int(self.rect.width / 2)
+        self.rect.centerx = WIDTH /    2
         self.rect.bottom = HEIGHT - 10
         self.speedx = 0
         self.speedy = 0
@@ -48,6 +49,7 @@ class Player(pygame.sprite.Sprite):
         all_sprites.add(rocket)
         rockets.add(rocket)
 
+
 # Класс выстрела (ракета)
 class Rocket(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -65,6 +67,7 @@ class Rocket(pygame.sprite.Sprite):
         if self.rect.bottom < 0:
             self.kill()
 
+
 # Класс для метеорита
 class Meteorite(pygame.sprite.Sprite):
     def __init__(self):
@@ -72,6 +75,7 @@ class Meteorite(pygame.sprite.Sprite):
         self.image = meteorite_img
         self.image.set_colorkey((255, 255, 255))
         self.rect = self.image.get_rect()
+        self.radius = int(self.rect.width / 2)
         self.rect.x = random.randrange(WIDTH - self.rect.width)
         self.rect.y = random.randrange(-100, -40)
         self.speedy = random.randrange(1, 8)
@@ -108,10 +112,10 @@ meteorites = pygame.sprite.Group()
 rockets = pygame.sprite.Group()
 player = Player()
 all_sprites.add(player)
-for i in range(8):
-    m = Meteorite()
-    all_sprites.add(m)
-    meteorites.add(m)
+for i in range(9):
+    meteorite = Meteorite()
+    all_sprites.add(meteorite)
+    meteorites.add(meteorite)
 # Игровой цикл
 running = True
 while running:
@@ -122,7 +126,18 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 player.shoot()
+    # Обновление
     all_sprites.update()
+    # Проверка попадания ракеты
+    hits = pygame.sprite.groupcollide(meteorites, rockets, True, True)
+    for hit in hits:
+        meteorite = Meteorite()
+        all_sprites.add(meteorite)
+        meteorites.add(meteorite)
+    # Проверка столкновения метеоритов и игрока
+    hits = pygame.sprite.spritecollide(player, meteorites, False, pygame.sprite.collide_circle)
+    if hits:
+        running = False
     screen.fill((0, 0, 0))
     screen.blit(background, background_rect)
     all_sprites.draw(screen)
